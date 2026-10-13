@@ -24,6 +24,26 @@ jobs:
               <string name="guard_desc">برای تشخیص باز شدن برنامه‌های انتخاب‌شده و نمایش صفحه قفل تمرین استفاده می‌شود. اطلاعات صفحه خوانده نمی‌شود.</string>
           </resources>
           EOF
+          cat > app/build.gradle.kts <<'EOF'
+          plugins {
+              id("com.android.application")
+              id("org.jetbrains.kotlin.android")
+          }
+          kotlin {
+              jvmToolchain(21)
+          }
+          android {
+              namespace = "com.amirali.project"
+              compileSdk = 36
+              defaultConfig {
+                  applicationId = "com.amirali.project"
+                  minSdk = 26
+                  targetSdk = 35
+                  versionCode = 1
+                  versionName = "0.1.0"
+              }
+          }
+          EOF
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
