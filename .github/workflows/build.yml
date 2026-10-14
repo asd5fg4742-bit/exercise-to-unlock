@@ -7,43 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -q ProjectAmirali-source.zip
+      - run: unzip -q VYRON_starter.zip
       - name: fix
-        working-directory: ProjectAmirali
-        run: |
-          cat > app/src/main/res/xml/app_guard_service.xml <<'EOF'
-          <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-              android:accessibilityEventTypes="typeWindowStateChanged|typeWindowsChanged"
-              android:accessibilityFeedbackType="feedbackGeneric"
-              android:notificationTimeout="250"
-              android:canRetrieveWindowContent="false"
-              android:description="@string/guard_desc" />
-          EOF
-          cat > app/src/main/res/values/strings.xml <<'EOF'
-          <resources>
-              <string name="guard_desc">برای تشخیص باز شدن برنامه‌های انتخاب‌شده و نمایش صفحه قفل تمرین استفاده می‌شود. اطلاعات صفحه خوانده نمی‌شود.</string>
-          </resources>
-          EOF
-          cat > app/build.gradle.kts <<'EOF'
-          plugins {
-              id("com.android.application")
-              id("org.jetbrains.kotlin.android")
-          }
-          kotlin {
-              jvmToolchain(21)
-          }
-          android {
-              namespace = "com.amirali.project"
-              compileSdk = 36
-              defaultConfig {
-                  applicationId = "com.amirali.project"
-                  minSdk = 26
-                  targetSdk = 35
-                  versionCode = 1
-                  versionName = "0.1.0"
-              }
-          }
-          EOF
+        working-directory: VYRON
+        run: printf '\nkotlin {\n    jvmToolchain(21)\n}\n' >> app/build.gradle.kts
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -52,8 +19,8 @@ jobs:
         with:
           gradle-version: 8.13
       - run: gradle assembleDebug --stacktrace
-        working-directory: ProjectAmirali
+        working-directory: VYRON
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: ProjectAmirali/app/build/outputs/apk/debug/*.apk
+          path: VYRON/app/build/outputs/apk/debug/*.apk
