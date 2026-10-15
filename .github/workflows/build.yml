@@ -7,10 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -q VYRON_starter.zip
+        with:
+          fetch-depth: 0
+      - name: find newest zip
+        run: |
+          Z=$(git log --name-only --format= -- '*.zip' | grep -m1 '\.zip$')
+          echo "zip: $Z"
+          mkdir proj
+          unzip -q "$Z" -d proj
+          S=$(find proj -name settings.gradle.kts | head -1)
+          echo "PDIR=$(dirname "$S")" >> "$GITHUB_ENV"
       - name: fix
-        working-directory: VYRON
-        run: printf '\nkotlin {\n    jvmToolchain(21)\n}\n' >> app/build.gradle.kts
+        run: |
+          cd "$PDIR"
+          grep -q jvmToolchain app/build.gradle.kts || printf '\nkotlin {\n    jvmToolchain(21)\n}\n' >> app/build.gradle.kts
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -18,9 +28,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.13
-      - run: gradle assembleDebug --stacktrace
-        working-directory: VYRON
+      - name: build
+        run: |
+          cd "$PDIR"
+          gradle assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: apk
-          path: VYRON/app/build/outputs/apk/debug/*.apk
+          path: proj/**/app/build/outputs/apk/debug/*.apk
