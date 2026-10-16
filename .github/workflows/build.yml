@@ -21,6 +21,7 @@ jobs:
         run: |
           cd "$PDIR"
           grep -q jvmToolchain app/build.gradle.kts || printf '\nkotlin {\n    jvmToolchain(21)\n}\n' >> app/build.gradle.kts
+          sed -i 's/onSmartLock = { startActivity(Intent(this, SquatCameraActivity::class.java)) }/onSmartLock = { context.startActivity(Intent(context, SquatCameraActivity::class.java)) }/' app/src/main/java/com/vyron/app/MainActivity.kt
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
