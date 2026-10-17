@@ -11,10 +11,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Find Android project
+      - name: Extract project zip
         run: |
-          S=$(find . -name settings.gradle.kts -not -path "*/build/*" -not -path "./.git/*" | head -n 1)
-          if [ -z "$S" ]; then echo "settings.gradle.kts not found"; exit 1; fi
+          Z=$(find . -name "*.zip" -not -path "./.git/*" | head -n 1)
+          if [ -z "$Z" ]; then echo "no zip found in repo"; exit 1; fi
+          echo "zip: $Z"
+          mkdir -p proj
+          unzip -q "$Z" -d proj
+          S=$(find proj -name settings.gradle.kts -not -path "*/build/*" | head -n 1)
+          if [ -z "$S" ]; then echo "settings.gradle.kts not found inside zip"; exit 1; fi
           PDIR=$(dirname "$S")
           echo "project dir: $PDIR"
           echo "PDIR=$PDIR" >> "$GITHUB_ENV"
@@ -44,5 +49,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vyron-debug-apk
-          path: "**/app/build/outputs/apk/debug/*.apk"
+          path: proj/**/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
