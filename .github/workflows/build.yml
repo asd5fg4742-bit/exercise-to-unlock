@@ -34,14 +34,13 @@ jobs:
         run: |
           SDKM=$(find "$ANDROID_HOME" -path "*cmdline-tools*" -name sdkmanager -type f | head -n 1)
           if [ -z "$SDKM" ]; then echo "sdkmanager not found in $ANDROID_HOME"; exit 1; fi
-          echo "sdkmanager: $SDKM"
           yes | "$SDKM" --licenses > /dev/null 2>&1 || true
           "$SDKM" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.9"
+          gradle-version: "8.13"
 
       - name: Build debug APK
         run: |
